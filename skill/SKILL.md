@@ -7,6 +7,14 @@ description: Daniel's video inspiration library. "/inspiration <link>" processes
 
 Dataset: `~/.claude/inspiration/library.md` (one markdown table, one row per video). Never load anything else to answer; keep replies short.
 
+## Always sync to GitHub
+
+`~/.claude/inspiration` is a clone of the public repo https://github.com/Danix2308/inspiration. **Every time the library changes** (row added in Mode A, GitHub-star rows in Mode B, `Tried?` updated, any manual fix) **or this skill's files change**, immediately run:
+
+`python -P ~/.claude/skills/inspiration/sync_github.py "<short commit message, e.g. Add reel: @handle title>"`
+
+It copies the skill into `skill/`, commits and pushes to `main` — no need to ask Daniel first. Add `· synced to GitHub` to the reply. If it prints `sync failed`, tell Daniel the one-line error; the local save still counts.
+
 ## Mode A — a link was given (`/inspiration <url> [optional note]`)
 
 1. Check the URL is not already in the library (grep it). If it is, show its row and stop.
