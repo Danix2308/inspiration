@@ -1,6 +1,6 @@
 ---
 name: inspiration
-description: Daniel's video inspiration library. "/inspiration <link>" processes an Instagram/TikTok/YouTube video and logs it in a dated table; "/inspiration" with no link reads the current work context and recommends which saved videos are useful right now.
+description: Daniel's video inspiration library. "/inspiration <link>" processes an Instagram/TikTok/YouTube video and logs it in a dated table; "/inspiration" with no link reads the current work context and recommends which saved videos are useful right now. Also use it whenever the user shares or asks about a video, reel or repo link that may not be in the library yet, even without typing /inspiration.
 ---
 
 # /inspiration
@@ -14,6 +14,16 @@ Dataset: `~/.claude/inspiration/library.md` (one markdown table, one row per vid
 `python -P ~/.claude/skills/inspiration/sync_github.py "<short commit message, e.g. Add reel: @handle title>"`
 
 It copies the skill into `skill/`, commits and pushes to `main` — no need to ask Daniel first. Add `· synced to GitHub` to the reply. If it prints `sync failed`, tell Daniel the one-line error; the local save still counts.
+
+## New videos always go in the library
+
+Whenever the user shares a video/reel/repo link in chat, or asks to check one (including a link in an email or message they asked to open):
+
+1. Pull first so the check uses the newest library: `git -C ~/.claude/inspiration pull -q --rebase --autostash origin main`. If it fails, say so and continue with the local copy.
+2. Look for the link's ID in `library.md` (the part after `/reel/`, `/p/`, `v=` or `owner/repo`; ignore everything after `?`).
+3. **Not there → add it with Mode A without being asked, then sync to GitHub** (section above). Already there → show its row; never add a second one.
+4. Links only seen in passing (other emails, page ads, "more posts", comments) are not added. Never put email text, keys or other private details in a row: the repo is public.
+5. If the push is refused, keep the local commit, tell the user it is NOT on GitHub yet, and push it as soon as access works.
 
 ## Mode A — a link was given (`/inspiration <url> [optional note]`)
 
