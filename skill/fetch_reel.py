@@ -34,9 +34,14 @@ try:
     tmp = tempfile.mkdtemp()
     subprocess.run(["yt-dlp", "-x", "--audio-format", "mp3", "--no-warnings", "-q",
                     "-o", os.path.join(tmp, "a.%(ext)s"), url], timeout=180, check=True)
+    # Decode with ffmpeg: faster-whisper's own decoder breaks on newer PyAV (metadata_errors)
+    pcm = subprocess.run(["ffmpeg", "-v", "error", "-i", os.path.join(tmp, "a.mp3"),
+                          "-f", "f32le", "-ac", "1", "-ar", "16000", "-"],
+                         capture_output=True, timeout=120, check=True).stdout
+    import numpy as np
     from faster_whisper import WhisperModel
     segs, _ = WhisperModel("base", device="cpu", compute_type="int8").transcribe(
-        os.path.join(tmp, "a.mp3"))
+        np.frombuffer(pcm, np.float32).copy())
     out["transcript"] = " ".join(s.text.strip() for s in segs)[:3000]
 except Exception as e:
     out["transcript_error"] = str(e)[:200]
